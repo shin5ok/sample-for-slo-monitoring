@@ -17,6 +17,7 @@ import (
 
 var projectID = os.Getenv("PROJECT")
 var portNumber = os.Getenv("PORT")
+var promPortNumber = "10080"
 
 func init() {
 	log.Logger = zerolog.New(os.Stderr).With().Timestamp().Logger()
@@ -39,11 +40,12 @@ func main() {
 	prom := ginmetrics.GetMonitor()
 	prom.SetMetricPath("/metrics")
 	prom.SetSlowTime(10)
+	prom.SetDuration([]float64{0.1, 0.3, 1.2, 5, 10})
 	prom.UseWithoutExposingEndpoint(g)
 	prom.Expose(forProm)
 
 	go func() {
-		forProm.Run(":8000")
+		forProm.Run(":" + promPortNumber)
 	}()
 
 	if portNumber == "" {
