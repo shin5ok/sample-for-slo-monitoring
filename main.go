@@ -27,7 +27,11 @@ func init() {
 
 func main() {
 	ctx := context.Background()
-	client, _ := firestore.NewClient(ctx, projectID)
+	client, err := firestore.NewClient(ctx, projectID)
+	if err != nil {
+		log.Error().Err(err)
+		return
+	}
 
 	g := genRouter(ctx, client)
 
@@ -70,22 +74,26 @@ func genRouter(ctx context.Context, client *firestore.Client) *gin.Engine {
 		snap, err := itr.Next()
 
 		var responseData = gin.H{}
-		var httpStatus = http.StatusNotFound
+		var httpStatus = http.StatusInternalServerError
 
-		if err == nil {
-			responseData = snap.Data()
-			httpStatus = http.StatusOK
-			finish := time.Now()
-			difftime := finish.Sub(start)
-			log.Info().
-				Str("path", c.Request.URL.Path).
-				Str("host", c.Request.Host).
-				Str("method", c.Request.Method).
-				Str("remote_addr", c.Request.RemoteAddr).
-				Str("user_agent", c.Request.UserAgent()).
-				Int64("process_time", difftime.Milliseconds()).
-				Send()
+		if err != nil {
+			log.Err(err)
+			responseData = gin.H{"Error": err}
+			c.JSON(httpStatus, responseData)
 		}
+
+		responseData = snap.Data()
+		httpStatus = http.StatusOK
+		finish := time.Now()
+		difftime := finish.Sub(start)
+		log.Info().
+			Str("path", c.Request.URL.Path).
+			Str("host", c.Request.Host).
+			Str("method", c.Request.Method).
+			Str("remote_addr", c.Request.RemoteAddr).
+			Str("user_agent", c.Request.UserAgent()).
+			Int64("process_time", difftime.Milliseconds()).
+			Send()
 
 		c.JSON(httpStatus, responseData)
 
