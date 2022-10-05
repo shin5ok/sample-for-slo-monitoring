@@ -7,10 +7,12 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	chiprometheus "github.com/766b/chi-prometheus"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog"
 	"github.com/go-chi/render"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var appName = "myapp"
@@ -19,14 +21,19 @@ var projectID = os.Getenv("PROJECT_ID")
 
 func main() {
 
-	httpLogger := httplog.NewLogger(appName, httplog.Options{JSON: true, LevelFieldName: "severity", Concise: true})
 	oplog := httplog.LogEntry(context.Background())
+	httpLogger := httplog.NewLogger(appName, httplog.Options{JSON: true, LevelFieldName: "severity", Concise: true})
+
+	m := chiprometheus.NewMiddleware(appName)
 
 	v := chi.NewRouter()
 	// r.Use(middleware.Logger)
 	v.Use(middleware.RequestID)
 	v.Use(middleware.Timeout(60 * time.Second))
 	v.Use(httplog.RequestLogger(httpLogger))
+	v.Use(m)
+
+	v.Handle("/metrics", promhttp.Handler())
 
 	v.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		render.JSON(w, r, map[string]string{"Ping": "Pong"})
