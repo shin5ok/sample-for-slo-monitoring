@@ -5,12 +5,16 @@ go 1.19
 require (
 	cloud.google.com/go/firestore v1.6.1
 	github.com/gin-gonic/gin v1.8.1
+	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-chi/httplog v0.2.5
+	github.com/go-chi/render v1.0.2
 	github.com/penglongli/gin-metrics v0.1.10
 	github.com/rs/zerolog v1.28.0
 )
 
 require (
 	cloud.google.com/go v0.97.0 // indirect
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -41,7 +45,7 @@ require (
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect
 	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1 // indirect
-	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.59.0 // indirect
