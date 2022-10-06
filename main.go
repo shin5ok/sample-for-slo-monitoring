@@ -22,8 +22,10 @@ var projectID = os.Getenv("PROJECT_ID")
 func main() {
 
 	oplog := httplog.LogEntry(context.Background())
+	/* jsonify logging */
 	httpLogger := httplog.NewLogger(appName, httplog.Options{JSON: true, LevelFieldName: "severity", Concise: true})
 
+	/* exporter for prometheus */
 	m := chiprometheus.NewMiddleware(appName)
 
 	v := chi.NewRouter()
@@ -40,6 +42,16 @@ func main() {
 	})
 
 	v.Get("/api/author/{user:[a-z0-9-.]+}", getFirestore)
+
+	v2 := chi.NewRouter()
+	v2.Use(m)
+	v2.Use(middleware.Timeout(60 * time.Second))
+	v2.Handle("/metrics", promhttp.Handler())
+	go func() {
+		if err := http.ListenAndServe(":10080", v2); err != nil {
+			oplog.Err(err)
+		}
+	}()
 
 	if err := http.ListenAndServe(":8080", v); err != nil {
 		oplog.Err(err)
