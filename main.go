@@ -18,6 +18,7 @@ import (
 var appName = "myapp"
 
 var projectID = os.Getenv("PROJECT_ID")
+var servicePort = os.Getenv("PORT")
 
 func main() {
 
@@ -53,7 +54,7 @@ func main() {
 		}
 	}()
 
-	if err := http.ListenAndServe(":8080", v); err != nil {
+	if err := http.ListenAndServe(":"+servicePort, v); err != nil {
 		oplog.Err(err)
 	}
 
